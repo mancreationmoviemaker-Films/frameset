@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FramePlan Studio — Professional Film Scene Planning & Shot Blocking</title>
+  <meta name="description" content="Professional browser-based film scene planning, shot blocking, camera setups, and lighting diagram studio for filmmakers." />
+  <meta property="og:title" content="FramePlan Studio — Film Scene Planning" />
+  <meta property="og:description" content="Professional browser-based film scene planning, shot blocking, camera setups, and lighting diagram studio." />
+  <meta property="og:type" content="website" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body class="theme-dark">
+  <!-- Application Container -->
+  <div id="app" class="app-layout">
+    
+    <!-- TOP BAR -->
+    <header id="top-bar" class="top-bar">
+      <!-- Left: Logo & Project / Scene Identification -->
+      <div class="top-bar-left">
+        <button id="btn-project-menu" class="btn-icon-subtle" title="Project Options & Scenes" aria-label="Project Menu">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+
+        <div class="app-branding">
+          <div class="brand-logo" aria-hidden="true">
+            <svg class="icon brand-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 4h16V6H4v2zm0 10h16v-8H4v8zm2-6h3v4H6v-4zm5 0h3v4h-3v-4zm5 0h2v4h-2v-4z"/>
+            </svg>
+          </div>
+          <span class="brand-name">FramePlan<span class="brand-accent">Studio</span></span>
+        </div>
+
+        <div class="top-divider"></div>
+
+        <div class="project-info">
+          <div class="editable-title-wrap" title="Click to rename project">
+            <input type="text" id="project-title-input" class="top-input" value="Untitled Film Project" aria-label="Project Title" spellcheck="false" />
+          </div>
+          <span class="separator-dot">/</span>
+          <div class="scene-selector-dropdown-wrap">
+            <button id="btn-scene-picker" class="scene-picker-btn" title="Switch or manage scenes">
+              <span id="current-scene-badge" class="scene-badge">SCENE 1</span>
+              <span id="top-scene-name" class="scene-name-label">Scene 1</span>
+              <svg class="icon icon-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </button>
+            <!-- Dropdown Scene List -->
+            <div id="scenes-dropdown" class="dropdown-menu hidden">
+              <div class="dropdown-header">
+                <span>SCENES IN PROJECT</span>
+                <button id="btn-add-scene" class="btn-xs btn-primary">+ New Scene</button>
+              </div>
+              <ul id="scenes-list-container" class="dropdown-list">
+                <!-- Dynamically populated scenes -->
+              </ul>
+            </div>
+          </div>
+
+          <!-- Quick Blank Project / Demo Buttons -->
+          <div class="top-quick-actions">
+            <button id="btn-new-blank-project" class="btn-xs btn-outline" title="Start a fresh empty project with no objects">
+              <svg class="icon icon-micro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>+ Blank Project</span>
+            </button>
+            <button id="btn-load-demo" class="btn-xs btn-ghost text-muted" title="Load sample demo scene (Terrace blocking)">
+              <span>Sample Demo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Scene Heading INT/EXT Description Banner -->
+      <div class="top-bar-center">
+        <div id="scene-slugline" class="scene-slugline" title="Double click to edit slugline">
+          <span id="slug-env" class="slug-tag">INT.</span>
+          <span id="slug-location" class="slug-location">TERRACE APARTMENT</span>
+          <span class="slug-dash">-</span>
+          <span id="slug-time" class="slug-time">NIGHT</span>
+        </div>
+      </div>
+
+      <!-- Right: Action Buttons & Utilities -->
+      <div class="top-bar-right">
+        <!-- History Controls -->
+        <div class="btn-group">
+          <button id="btn-undo" class="btn-icon" title="Undo (Ctrl+Z)" disabled aria-label="Undo">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7v6h6M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
+            </svg>
+          </button>
+          <button id="btn-redo" class="btn-icon" title="Redo (Ctrl+Y)" disabled aria-label="Redo">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 7v6h-6M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="top-divider"></div>
+
+        <!-- Autosave Indicator -->
+        <div id="save-status-indicator" class="save-status" title="Project changes saved to browser storage">
+          <span class="status-dot"></span>
+          <span id="save-status-text">Saved</span>
+        </div>
+
+        <!-- Scale Badge -->
+        <div id="scale-badge" class="scale-indicator" title="1 Grid Unit = 1.0 m">
+          <span>1 grid = 1.0m</span>
+        </div>
+
+        <!-- Legend & Shot List Toggle Buttons -->
+        <button id="btn-toggle-legend" class="btn-pill-toggle active" title="Toggle On-Canvas Legend">
+          Legend
+        </button>
+
+        <button id="btn-quick-shotlist" class="btn-pill-toggle" title="Toggle Shot List Panel">
+          Shots (<span id="top-shots-count">0</span>)
+        </button>
+
+        <button id="btn-toggle-timeline" class="btn-pill-toggle" title="Toggle Scene Timeline & Shot Blocking Dock (T)">
+          <svg class="icon icon-micro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>Timeline</span>
+        </button>
+
+        <!-- Export Menu Dropdown -->
+        <div class="relative-dropdown">
+          <button id="btn-export-menu" class="btn btn-secondary" title="Export diagram or data">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            <span>Export</span>
+          </button>
+          <div id="export-dropdown" class="dropdown-menu dropdown-right hidden">
+            <button id="btn-export-png" class="dropdown-item">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+              <span>Export High-Res PNG</span>
+            </button>
+            <button id="btn-export-jpg" class="dropdown-item">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8" cy="8" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+              <span>Export JPG Image</span>
+            </button>
+            <button id="btn-export-svg" class="dropdown-item">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 2 6 6-6 6M2 14l6-6-6-6M10 20l4-16"/></svg>
+              <span>Export Vector SVG</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button id="btn-export-json" class="dropdown-item">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Export Project Data (JSON)</span>
+            </button>
+            <button id="btn-import-json" class="dropdown-item">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <span>Import Project Data (JSON)</span>
+            </button>
+            <input type="file" id="json-file-input" accept=".json" class="hidden" />
+            <div class="dropdown-divider"></div>
+            <button id="btn-print-scene" class="dropdown-item">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+              <span>Print Blocking Sheet / PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Project Actions -->
+        <button id="btn-save-project" class="btn btn-primary" title="Force Save (Ctrl+S)">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span>Save</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="btn-theme-toggle" class="btn-icon" title="Toggle Light/Dark Theme" aria-label="Theme toggle">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg class="icon icon-moon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+
+        <!-- Fullscreen Button -->
+        <button id="btn-fullscreen" class="btn-icon" title="Toggle Fullscreen" aria-label="Fullscreen">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+        </button>
+
+        <!-- Help Button -->
+        <button id="btn-help" class="btn-icon" title="Shortcuts & Documentation (?)" aria-label="Help">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTEXTUAL SUB-TOOLBAR -->
+    <div id="contextual-bar" class="contextual-bar">
+      <!-- Active Tool Feedback -->
+      <div class="context-mode-indicator">
+        <span class="mode-label">TOOL:</span>
+        <span id="active-tool-name" class="mode-value">Select & Move (V)</span>
+      </div>
+
+      <div class="context-divider"></div>
+
+      <!-- Contextual controls for Drawing / Shapes / Selection -->
+      <div id="context-controls-container" class="context-controls">
+        <!-- Filled dynamically based on tool or selection -->
+        <div id="selection-quick-actions" class="context-group">
+          <span class="context-hint">Click object to select · Shift+Drag to box select · Space+Drag to pan canvas</span>
+        </div>
+      </div>
+
+      <!-- Right side of subtoolbar: Snapping & Grid quick toggles -->
+      <div class="context-quick-toggles">
+        <label class="toggle-checkbox" title="Snap to grid when moving or drawing">
+          <input type="checkbox" id="chk-snap-grid" checked />
+          <span class="toggle-text">Snap to Grid</span>
+        </label>
+        <div class="context-divider"></div>
+        <button id="btn-quick-center" class="btn-xs btn-subtle" title="Center viewport to scene content">
+          Center View
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="workspace-body">
+      
+      <!-- LEFT FLOATING TOOLBAR -->
+      <aside id="left-toolbar" class="left-toolbar" aria-label="Tools">
+        <div class="tools-group">
+          <!-- 1. Select -->
+          <button id="tool-select" class="tool-btn active" data-tool="select" title="Select & Transform (V)" aria-label="Select tool">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 3 7 18 3-7 7-3L3 3z"/></svg>
+            <span class="tool-label">Select</span>
+          </button>
+
+          <!-- 2. Pan / Hand -->
+          <button id="tool-pan" class="tool-btn" data-tool="pan" title="Hand / Pan Canvas (H or Space+Drag)" aria-label="Pan tool">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8M6 14v1a7 7 0 0 0 7 7h1.5a6.5 6.5 0 0 0 6.5-6.5V11a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2"/></svg>
+            <span class="tool-label">Pan</span>
+          </button>
+        </div>
+
+        <div class="toolbar-sep"></div>
+
+        <div class="tools-group">
+          <!-- 3. Actors Library -->
+          <button id="tool-actors" class="tool-btn" data-tool="actors" title="Actors Library (A)" aria-label="Actors library">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="tool-label">Actors</span>
+          </button>
+
+          <!-- 4. Camera Library -->
+          <button id="tool-cameras" class="tool-btn" data-tool="cameras" title="Cameras & FOV Blocking (C)" aria-label="Camera library">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+            <span class="tool-label">Cameras</span>
+          </button>
+
+          <!-- 5. Lighting Library -->
+          <button id="tool-lighting" class="tool-btn" data-tool="lighting" title="Lighting Library (L)" aria-label="Lighting library">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></svg>
+            <span class="tool-label">Lighting</span>
+          </button>
+
+          <!-- 6. Props Library -->
+          <button id="tool-props" class="tool-btn" data-tool="props" title="Searchable Props Library (P)" aria-label="Props library">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"/><path d="M3 11v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H7v-2a2 2 0 0 0-4 0Z"/><path d="M5 18v2M19 18v2"/></svg>
+            <span class="tool-label">Props</span>
+          </button>
+
+          <!-- 7. Vehicles Library -->
+          <button id="tool-vehicles" class="tool-btn" data-tool="vehicles" title="Vehicles Library (VH)" aria-label="Vehicles library">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.1 10.7 2 11.1 2 11.5V16c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+            <span class="tool-label">Vehicles</span>
+          </button>
+        </div>
+
+        <div class="toolbar-sep"></div>
+
+        <div class="tools-group">
+          <!-- 8. Blocking Paths (Actor/Camera movement) -->
+          <button id="tool-blocking" class="tool-btn" data-tool="blocking" title="Movement Blocking Path (B)" aria-label="Blocking path tool">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="4" cy="19" r="2"/><circle cx="20" cy="5" r="2"/><path d="M6 19c6 0 12-8 12-12"/><path d="m14 7 4-2-2 4"/></svg>
+            <span class="tool-label">Blocking</span>
+          </button>
+
+          <!-- 9. Custom Drawing (Pencil / Brush / Highlighter) -->
+          <button id="tool-draw" class="tool-btn" data-tool="draw" title="Draw Tool (D)" aria-label="Pencil tool">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 2 4 4-14 14H4v-4L18 2z"/></svg>
+            <span class="tool-label">Draw</span>
+          </button>
+
+          <!-- 10. Shapes / Architectural (Walls, Doors, Rect, Circle) -->
+          <button id="tool-shapes" class="tool-btn" data-tool="shapes" title="Shapes & Walls (S)" aria-label="Shapes tool">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="5" y="5" rx="1"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/></svg>
+            <span class="tool-label">Shapes</span>
+          </button>
+
+          <!-- 11. Text Tool -->
+          <button id="tool-text" class="tool-btn" data-tool="text" title="Text Labels & Notes (T)" aria-label="Text tool">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            <span class="tool-label">Text</span>
+          </button>
+
+          <!-- 12. Eraser -->
+          <button id="tool-eraser" class="tool-btn" data-tool="eraser" title="Eraser Tool (E)" aria-label="Eraser tool">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
+            <span class="tool-label">Eraser</span>
+          </button>
+
+          <!-- 13. Measure Tool -->
+          <button id="tool-measure" class="tool-btn" data-tool="measure" title="Measurement Ruler (M)" aria-label="Measure tool">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span class="tool-label">Measure</span>
+          </button>
+        </div>
+
+        <div class="toolbar-sep"></div>
+
+        <div class="tools-group">
+          <!-- 14. Reference Floorplan Image -->
+          <button id="tool-image" class="tool-btn" data-tool="image" title="Upload Floorplan / Blueprint Image (I)" aria-label="Floorplan image">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            <span class="tool-label">Floorplan</span>
+          </button>
+          <input type="file" id="floorplan-file-input" accept="image/*" class="hidden" />
+
+          <!-- 15. Grid Settings -->
+          <button id="tool-grid" class="tool-btn" data-tool="grid" title="Grid & Background Setup (G)" aria-label="Grid setup">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+            <span class="tool-label">Grid</span>
+          </button>
+
+          <!-- 16. Delete Selected -->
+          <button id="tool-delete" class="tool-btn btn-danger-hover" title="Delete Selected Object (Del / Backspace)" aria-label="Delete">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            <span class="tool-label">Delete</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- INFINITE CANVAS WORKSPACE -->
+      <main id="canvas-viewport" class="canvas-viewport" tabindex="0">
+        <!-- SVG Canvas Root for Infinite Scene -->
+        <svg id="scene-svg" class="scene-svg" xmlns="http://www.w3.org/2000/svg">
+          <!-- Definitions: Patterns, Markers, Gradients, Filters -->
+          <defs>
+            <!-- Grid Patterns (Small, Medium, Large) -->
+            <pattern id="grid-pattern-small" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" class="grid-line" stroke-width="0.5" />
+            </pattern>
+            <pattern id="grid-pattern-medium" width="40" height="40" patternUnits="userSpaceOnUse">
+              <rect width="40" height="40" fill="none" />
+              <path d="M 40 0 L 0 0 0 40" fill="none" class="grid-line" stroke-width="0.75" />
+              <circle cx="0" cy="0" r="1.5" class="grid-dot" />
+            </pattern>
+            <pattern id="grid-pattern-large" width="80" height="80" patternUnits="userSpaceOnUse">
+              <rect width="80" height="80" fill="none" />
+              <path d="M 80 0 L 0 0 0 80" fill="none" class="grid-line" stroke-width="1" />
+              <circle cx="0" cy="0" r="2" class="grid-dot" />
+            </pattern>
+
+            <!-- Arrow Markers for Blocking -->
+            <marker id="arrow-actor" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" class="marker-actor-fill" />
+            </marker>
+            <marker id="arrow-camera" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" class="marker-camera-fill" />
+            </marker>
+            <marker id="arrow-general" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="currentColor" />
+            </marker>
+            <marker id="dot-start" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+              <circle cx="5" cy="5" r="4" fill="currentColor" />
+            </marker>
+
+            <!-- Glow Filters & Soft Shadows -->
+            <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3" />
+            </filter>
+            <filter id="light-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            <!-- Radial Gradients for Lighting Fixtures -->
+            <radialGradient id="light-beam-radial" cx="50%" cy="0%" r="100%" fx="50%" fy="0%">
+              <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.45" />
+              <stop offset="60%" stop-color="#fbbf24" stop-opacity="0.18" />
+              <stop offset="100%" stop-color="#fbbf24" stop-opacity="0" />
+            </radialGradient>
+            <radialGradient id="omni-light-radial" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fef08a" stop-opacity="0.5" />
+              <stop offset="70%" stop-color="#fef08a" stop-opacity="0.15" />
+              <stop offset="100%" stop-color="#fef08a" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+
+          <!-- Infinite Grid Background Layer -->
+          <rect id="canvas-bg-fill" width="100%" height="100%" class="canvas-background" />
+          <rect id="canvas-grid-rect" width="100%" height="100%" fill="url(#grid-pattern-medium)" pointer-events="none" />
+
+          <!-- Dynamic Transformed World Layer (Root of all objects & drawings) -->
+          <g id="world-layer" transform="matrix(1 0 0 1 0 0)">
+            <!-- Reference Images Floorplans -->
+            <g id="layer-floorplans"></g>
+            <!-- Custom Drawings (Walls, lines, shapes, freehand) -->
+            <g id="layer-drawings"></g>
+            <!-- Props & Furniture Layer -->
+            <g id="layer-props"></g>
+            <!-- Vehicles Layer -->
+            <g id="layer-vehicles"></g>
+            <!-- Lighting & Beams Layer -->
+            <g id="layer-lighting"></g>
+            <!-- Cameras & Field of View Cones Layer -->
+            <g id="layer-cameras"></g>
+            <!-- Actors Layer -->
+            <g id="layer-actors"></g>
+            <!-- Blocking Paths Layer -->
+            <g id="layer-blocking"></g>
+            <!-- Text & Annotations Layer -->
+            <g id="layer-text"></g>
+            <!-- Measurement Annotations Layer -->
+            <g id="layer-measurements"></g>
+
+            <!-- Interactive Transformer Box & Handles -->
+            <g id="transformer-group" class="transformer-group hidden">
+              <!-- Bounding Rect -->
+              <rect id="transform-bounds" class="transform-box" x="0" y="0" width="100" height="100" />
+              
+              <!-- Edge resize lines -->
+              <line id="handle-line-n" class="handle-edge" />
+              <line id="handle-line-e" class="handle-edge" />
+              <line id="handle-line-s" class="handle-edge" />
+              <line id="handle-line-w" class="handle-edge" />
+
+              <!-- 8 Corner & Edge Handles -->
+              <circle id="handle-nw" class="transform-handle corner-handle" data-handle="nw" cx="0" cy="0" r="5" />
+              <circle id="handle-ne" class="transform-handle corner-handle" data-handle="ne" cx="100" cy="0" r="5" />
+              <circle id="handle-se" class="transform-handle corner-handle" data-handle="se" cx="100" cy="100" r="5" />
+              <circle id="handle-sw" class="transform-handle corner-handle" data-handle="sw" cx="0" cy="100" r="5" />
+              <circle id="handle-n" class="transform-handle edge-handle" data-handle="n" cx="50" cy="0" r="4" />
+              <circle id="handle-e" class="transform-handle edge-handle" data-handle="e" cx="100" cy="50" r="4" />
+              <circle id="handle-s" class="transform-handle edge-handle" data-handle="s" cx="50" cy="100" r="4" />
+              <circle id="handle-w" class="transform-handle edge-handle" data-handle="w" cx="0" cy="50" r="4" />
+
+              <!-- Rotation Handle stem and head -->
+              <line id="rot-stem" class="rot-stem" x1="50" y1="0" x2="50" y2="-24" />
+              <circle id="handle-rotate" class="transform-handle rot-handle" data-handle="rot" cx="50" cy="-24" r="6" />
+
+              <!-- Object Info Tag on Transformer -->
+              <g id="transform-label-group" class="transform-label-group">
+                <rect id="transform-label-bg" class="transform-label-bg" x="0" y="-48" width="80" height="20" rx="4" />
+                <text id="transform-label-text" class="transform-label-text" x="40" y="-34" text-anchor="middle">Object</text>
+              </g>
+            </g>
+
+            <!-- Multi-Select Marquee Rect -->
+            <rect id="marquee-rect" class="marquee-rect hidden" x="0" y="0" width="0" height="0" />
+
+            <!-- Active Drawing Preview Node (during mouse drag) -->
+            <g id="draw-preview-group"></g>
+          </g>
+        </svg>
+
+        <!-- On-Canvas HUD Controls (Bottom Right: Zoom & Navigation) -->
+        <div class="canvas-hud-controls">
+          <button id="btn-zoom-out" class="hud-btn" title="Zoom Out (-)" aria-label="Zoom Out">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          
+          <button id="btn-zoom-reset" class="hud-zoom-level" title="Reset Zoom to 100% (Click to reset)">
+            <span id="zoom-percentage">100%</span>
+          </button>
+
+          <button id="btn-zoom-in" class="hud-btn" title="Zoom In (+)" aria-label="Zoom In">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+
+          <div class="hud-sep"></div>
+
+          <button id="btn-fit-screen" class="hud-btn" title="Fit Entire Scene to Viewport" aria-label="Fit to Screen">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
+        </div>
+
+        <!-- On-Canvas Floating Legend (Bottom Left) -->
+        <div id="canvas-legend" class="canvas-legend">
+          <div class="legend-header">
+            <span class="legend-title">SCENE LEGEND</span>
+            <button id="btn-legend-collapse" class="btn-icon-micro" title="Minimize Legend">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg>
+            </button>
+          </div>
+          <div id="legend-content" class="legend-content">
+            <!-- Dynamically populated from scene objects -->
+          </div>
+        </div>
+
+        <!-- BOTTOM TIMELINE PANEL DOCK -->
+        <div id="timeline-dock" class="timeline-dock active">
+          <div class="timeline-header">
+            <div class="timeline-header-left">
+              <button id="btn-timeline-toggle" class="timeline-expand-btn" title="Collapse / Expand Timeline Panel">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="timeline-title-wrap">
+                <svg class="icon icon-timeline-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span class="timeline-title">SCENE TIMELINE & SHOT BLOCKING</span>
+                <span id="timeline-track-count-badge" class="badge-count">0 tracks</span>
+              </div>
+              
+              <!-- Timeline Transport Playback Controls -->
+              <div class="timeline-transport">
+                <button id="btn-tl-stop" class="transport-btn" title="Rewind to Start (00:00:00)">
+                  <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+                </button>
+                <button id="btn-tl-prev" class="transport-btn" title="Previous Cue / Frame">
+                  <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+                <button id="btn-tl-play" class="transport-btn transport-btn-play" title="Play / Pause Timeline (Space)">
+                  <svg class="icon icon-tl-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  <svg class="icon icon-tl-pause hidden" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                </button>
+                <button id="btn-tl-next" class="transport-btn" title="Next Cue / Frame">
+                  <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+              </div>
+
+              <!-- Timecode Display -->
+              <div class="timecode-display" title="Current Timeline Timecode (TC)">
+                <span id="tl-timecode-text">00:00:00</span>
+                <span class="tc-fps">24fps</span>
+              </div>
+            </div>
+
+            <div class="timeline-header-right">
+              <!-- Add Track Dropdown -->
+              <div class="relative-dropdown">
+                <button id="btn-tl-add-track-menu" class="btn btn-secondary btn-xs" title="Add track to timeline">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>+ Add Track</span>
+                </button>
+                <div id="tl-add-track-dropdown" class="dropdown-menu dropdown-right hidden">
+                  <button id="btn-tl-add-selected" class="dropdown-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                    <span>Add Selected Object(s) to Timeline</span>
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button id="btn-tl-add-actor-track" class="dropdown-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+                    <span>New Actor Blocking Track</span>
+                  </button>
+                  <button id="btn-tl-add-camera-track" class="dropdown-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+                    <span>New Camera Movement Track</span>
+                  </button>
+                  <button id="btn-tl-add-lighting-track" class="dropdown-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="6"/><circle cx="12" cy="12" r="4"/></svg>
+                    <span>New Lighting Cue Track</span>
+                  </button>
+                  <button id="btn-tl-add-action-track" class="dropdown-item">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+                    <span>New Shot / Action Beat Track</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick Add Cue Button -->
+              <button id="btn-tl-add-cue" class="btn btn-primary btn-xs" title="Add cue block at current playhead">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                <span>+ Add Cue</span>
+              </button>
+
+              <!-- Duration setting -->
+              <div class="tl-duration-box" title="Timeline Total Duration in Seconds">
+                <label for="tl-duration-input">Duration:</label>
+                <input type="number" id="tl-duration-input" class="input-micro" min="5" max="600" value="60" />
+                <span>s</span>
+              </div>
+
+              <!-- Timeline Zoom / Scale Controls -->
+              <div class="tl-zoom-controls">
+                <button id="btn-tl-zoom-out" class="btn-icon-micro" title="Zoom Out Timeline">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+                <span id="tl-zoom-label" class="tl-zoom-label">100%</span>
+                <button id="btn-tl-zoom-in" class="btn-icon-micro" title="Zoom In Timeline">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+              </div>
+
+              <!-- Close / Hide timeline button -->
+              <button id="btn-tl-close" class="btn-icon-micro" title="Close Timeline Dock">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Timeline Body: Left Track Headers Column + Right Scrollable Lanes & Ruler -->
+          <div class="timeline-body">
+            <!-- Left: Track Headers list -->
+            <div class="timeline-headers-col">
+              <div class="tl-ruler-header-spacer">
+                <span>TRACKS & OBJECTS</span>
+              </div>
+              <div id="tl-track-headers-list" class="tl-track-headers-list">
+                <!-- Rendered track headers -->
+              </div>
+            </div>
+
+            <!-- Right: Ruler & Tracks Content Area -->
+            <div id="timeline-lanes-scroll" class="timeline-lanes-scroll">
+              <!-- Time Ruler Canvas / Marks -->
+              <div id="timeline-ruler" class="timeline-ruler">
+                <!-- Ticks and numbers rendered via JS -->
+              </div>
+
+              <!-- Tracks Container -->
+              <div id="timeline-tracks-container" class="timeline-tracks-container">
+                <!-- Track rows and cue blocks rendered via JS -->
+              </div>
+
+              <!-- Playhead / Cursor Scrubber Line -->
+              <div id="timeline-playhead" class="timeline-playhead">
+                <div class="playhead-handle" title="Drag to scrub timeline">
+                  <svg viewBox="0 0 12 16"><polygon points="0 0, 12 0, 12 10, 6 16, 0 10" fill="#e50914"/></svg>
+                </div>
+                <div class="playhead-line"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coordinate & Dimension Tip on Cursor -->
+        <div id="cursor-hud" class="cursor-hud hidden">X: 0, Y: 0</div>
+      </main>
+
+      <!-- RIGHT SIDEBAR: Layers, Inspector, Shot List, Notes -->
+      <aside id="right-sidebar" class="right-sidebar">
+        <!-- Sidebar Tab Navigation -->
+        <div class="sidebar-tabs">
+          <button class="sidebar-tab active" data-tab="inspector" title="Properties & Inspector">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Inspector</span>
+          </button>
+          <button class="sidebar-tab" data-tab="layers" title="Scene Layers & Order">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            <span>Layers</span>
+          </button>
+          <button class="sidebar-tab" data-tab="shots" title="Shot List Planner">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10M6 14h6"/></svg>
+            <span>Shots</span>
+          </button>
+          <button class="sidebar-tab" data-tab="notes" title="Scene Notes & Summary">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Notes</span>
+          </button>
+        </div>
+
+        <!-- TAB CONTENT 1: INSPECTOR / OBJECT PROPERTIES -->
+        <div id="tab-inspector" class="sidebar-pane active">
+          <!-- Shown when no object is selected -->
+          <div id="inspector-empty-state" class="pane-empty-state">
+            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>
+            <p class="empty-title">No Object Selected</p>
+            <p class="empty-desc">Click any actor, camera, light, or prop on the canvas to inspect and customize its parameters.</p>
+            <div class="empty-actions">
+              <button id="btn-quick-add-actor" class="btn btn-secondary btn-sm">+ Add Actor</button>
+              <button id="btn-quick-add-cam" class="btn btn-secondary btn-sm">+ Add Camera</button>
+            </div>
+          </div>
+
+          <!-- Shown when object(s) selected -->
+          <div id="inspector-content" class="inspector-form hidden">
+            <!-- Header: Icon, Name, Type -->
+            <div class="inspector-header">
+              <div id="inspector-object-icon" class="object-badge-icon">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+              </div>
+              <div class="object-name-wrap">
+                <input type="text" id="prop-object-name" class="input-clean inspector-name-input" value="Object" spellcheck="false" title="Double click to rename" />
+                <span id="prop-object-category" class="object-category-tag">Actor</span>
+              </div>
+            </div>
+
+            <!-- Quick Action Row (Duplicate, Lock, Delete) -->
+            <div class="inspector-quick-row">
+              <button id="btn-obj-duplicate" class="btn-micro" title="Duplicate (Ctrl+D)">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span>Duplicate</span>
+              </button>
+              <button id="btn-obj-lock" class="btn-micro" title="Lock Object Position">
+                <svg class="icon icon-lock-unlocked" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+                <span id="label-obj-lock">Lock</span>
+              </button>
+              <button id="btn-obj-delete" class="btn-micro btn-micro-danger" title="Delete Object">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+                <span>Delete</span>
+              </button>
+            </div>
+
+            <!-- Add to Timeline Action -->
+            <div class="inspector-timeline-action">
+              <button id="btn-add-to-timeline" class="btn btn-secondary btn-sm w-full btn-add-timeline" title="Add this Actor or Object to the Scene Timeline (T)">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Add to Timeline Track</span>
+              </button>
+            </div>
+
+            <!-- Transform Section: X, Y, W, H, Rotation -->
+            <div class="inspector-section">
+              <div class="section-title">TRANSFORM & POSITION</div>
+              <div class="grid-2-col">
+                <div class="form-field">
+                  <label for="prop-pos-x">X (px)</label>
+                  <input type="number" id="prop-pos-x" class="input-num" step="1" />
+                </div>
+                <div class="form-field">
+                  <label for="prop-pos-y">Y (px)</label>
+                  <input type="number" id="prop-pos-y" class="input-num" step="1" />
+                </div>
+              </div>
+              <div class="grid-2-col">
+                <div class="form-field">
+                  <label for="prop-width">Width</label>
+                  <input type="number" id="prop-width" class="input-num" min="5" step="1" />
+                </div>
+                <div class="form-field">
+                  <label for="prop-height">Height</label>
+                  <input type="number" id="prop-height" class="input-num" min="5" step="1" />
+                </div>
+              </div>
+              <div class="form-field">
+                <div class="field-label-split">
+                  <label for="prop-rotation">Rotation (°)</label>
+                  <span id="prop-rotation-val" class="field-val">0°</span>
+                </div>
+                <div class="slider-with-quick">
+                  <input type="range" id="prop-rotation" class="input-range" min="-180" max="180" value="0" />
+                  <div class="quick-rot-buttons">
+                    <button class="btn-rot-step" data-rot="0">0°</button>
+                    <button class="btn-rot-step" data-rot="90">90°</button>
+                    <button class="btn-rot-step" data-rot="180">180°</button>
+                    <button class="btn-rot-step" data-rot="270">270°</button>
+                  </div>
+                </div>
+              </div>
+              <div class="form-field">
+                <div class="field-label-split">
+                  <label for="prop-opacity">Opacity</label>
+                  <span id="prop-opacity-val" class="field-val">100%</span>
+                </div>
+                <input type="range" id="prop-opacity" class="input-range" min="0.05" max="1" step="0.05" value="1" />
+              </div>
+            </div>
+
+            <!-- CAMERA SPECIFIC PROPERTIES (Visible when Camera is selected) -->
+            <div id="inspector-camera-section" class="inspector-section hidden">
+              <div class="section-title">CAMERA SPECIFICATIONS</div>
+              <div class="form-field">
+                <label for="cam-prop-shot-type">Shot Type</label>
+                <select id="cam-prop-shot-type" class="input-select">
+                  <option value="Extreme Wide Shot">Extreme Wide Shot (EWS)</option>
+                  <option value="Wide Shot">Wide Shot (WS)</option>
+                  <option value="Full Shot">Full Shot (FS)</option>
+                  <option value="Medium Wide">Medium Wide (MWS)</option>
+                  <option value="Medium Shot" selected>Medium Shot (MS)</option>
+                  <option value="Medium Close-Up">Medium Close-Up (MCU)</option>
+                  <option value="Close-Up">Close-Up (CU)</option>
+                  <option value="Extreme Close-Up">Extreme Close-Up (ECU)</option>
+                  <option value="Over The Shoulder">Over The Shoulder (OTS)</option>
+                  <option value="Point Of View">Point Of View (POV)</option>
+                </select>
+              </div>
+
+              <div class="grid-2-col">
+                <div class="form-field">
+                  <label for="cam-prop-focal">Focal Length</label>
+                  <select id="cam-prop-focal" class="input-select">
+                    <option value="18">18mm (Ultra Wide)</option>
+                    <option value="24">24mm (Wide)</option>
+                    <option value="35" selected>35mm (Standard Wide)</option>
+                    <option value="50">50mm (Normal)</option>
+                    <option value="85">85mm (Portrait)</option>
+                    <option value="135">135mm (Telephoto)</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="cam-prop-movement">Movement</label>
+                  <select id="cam-prop-movement" class="input-select">
+                    <option value="Static" selected>Static (Tripod)</option>
+                    <option value="Pan">Pan</option>
+                    <option value="Tilt">Tilt</option>
+                    <option value="Dolly">Dolly Track</option>
+                    <option value="Tracking">Tracking</option>
+                    <option value="Crane">Crane / Jib</option>
+                    <option value="Handheld">Handheld</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="field-label-split">
+                  <label for="cam-prop-fov-range">FOV Cone Range (m)</label>
+                  <span id="cam-prop-fov-range-val" class="field-val">8.0m</span>
+                </div>
+                <input type="range" id="cam-prop-fov-range" class="input-range" min="2" max="25" step="0.5" value="8" />
+              </div>
+
+              <div class="grid-2-col">
+                <div class="form-field">
+                  <label for="cam-prop-height">Camera Height</label>
+                  <input type="text" id="cam-prop-height" class="input-text" value="1.6m (Eye)" />
+                </div>
+                <div class="form-field">
+                  <label for="cam-prop-angle">Vertical Angle</label>
+                  <select id="cam-prop-angle" class="input-select">
+                    <option value="Eye Level" selected>Eye Level</option>
+                    <option value="Low Angle">Low Angle</option>
+                    <option value="High Angle">High Angle</option>
+                    <option value="Bird's Eye">Bird's Eye</option>
+                    <option value="Dutch Angle">Dutch Angle</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- LIGHTING SPECIFIC PROPERTIES (Visible when Light is selected) -->
+            <div id="inspector-light-section" class="inspector-section hidden">
+              <div class="section-title">LIGHTING PARAMETERS</div>
+              <div class="form-field">
+                <div class="field-label-split">
+                  <label for="light-prop-intensity">Intensity</label>
+                  <span id="light-prop-intensity-val" class="field-val">85%</span>
+                </div>
+                <input type="range" id="light-prop-intensity" class="input-range" min="0" max="100" value="85" />
+              </div>
+              <div class="form-field">
+                <div class="field-label-split">
+                  <label for="light-prop-beam-angle">Beam Spread Angle (°)</label>
+                  <span id="light-prop-beam-angle-val" class="field-val">65°</span>
+                </div>
+                <input type="range" id="light-prop-beam-angle" class="input-range" min="15" max="160" value="65" />
+              </div>
+              <div class="form-field">
+                <div class="field-label-split">
+                  <label for="light-prop-beam-distance">Throw Distance</label>
+                  <span id="light-prop-beam-distance-val" class="field-val">6.0m</span>
+                </div>
+                <input type="range" id="light-prop-beam-distance" class="input-range" min="1" max="20" step="0.5" value="6" />
+              </div>
+              <div class="form-field">
+                <label>Color Temperature / Gel</label>
+                <div class="light-temp-presets">
+                  <button class="btn-temp-preset" data-temp="#ff9e3b" title="Warm Tungsten (3200K)">3200K</button>
+                  <button class="btn-temp-preset" data-temp="#ffe4b5" title="Halogen / Studio (4300K)">4300K</button>
+                  <button class="btn-temp-preset" data-temp="#f0f8ff" title="Daylight (5600K)">5600K</button>
+                  <button class="btn-temp-preset" data-temp="#bae6fd" title="Overcast / Cool (6500K)">6500K</button>
+                  <button class="btn-temp-preset" data-temp="#38bdf8" title="Cyan / Moonlight">Moon</button>
+                  <button class="btn-temp-preset" data-temp="#f43f5e" title="Red / Warning">Red</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ACTOR SPECIFIC PROPERTIES (Visible when Actor is selected) -->
+            <div id="inspector-actor-section" class="inspector-section hidden">
+              <div class="section-title">ACTOR DETAILS</div>
+              <div class="form-field">
+                <label for="actor-prop-role">Character / Role</label>
+                <input type="text" id="actor-prop-role" class="input-text" placeholder="e.g. Lead, Detective, Witness" />
+              </div>
+              <div class="form-field">
+                <label for="actor-prop-pose">Pose</label>
+                <select id="actor-prop-pose" class="input-select">
+                  <option value="standing" selected>Standing</option>
+                  <option value="sitting">Sitting</option>
+                  <option value="walking">Walking</option>
+                  <option value="running">Running</option>
+                  <option value="lying">Lying Down</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="actor-prop-blocking-note">Blocking Note</label>
+                <input type="text" id="actor-prop-blocking-note" class="input-text" placeholder="e.g. Enters from kitchen, stops at counter" />
+              </div>
+            </div>
+
+            <!-- TEXT SPECIFIC PROPERTIES (Visible when Text is selected) -->
+            <div id="inspector-text-section" class="inspector-section hidden">
+              <div class="section-title">TEXT STYLING</div>
+              <div class="form-field">
+                <label for="text-prop-content">Text Content</label>
+                <textarea id="text-prop-content" class="input-textarea" rows="2"></textarea>
+              </div>
+              <div class="grid-2-col">
+                <div class="form-field">
+                  <label for="text-prop-size">Font Size</label>
+                  <input type="number" id="text-prop-size" class="input-num" min="8" max="72" value="16" />
+                </div>
+                <div class="form-field">
+                  <label>Style</label>
+                  <div class="btn-group-toggle">
+                    <button id="btn-text-bold" class="btn-pill-toggle" title="Bold">B</button>
+                    <button id="btn-text-italic" class="btn-pill-toggle" title="Italic">I</button>
+                    <button id="btn-text-badge" class="btn-pill-toggle active" title="Badge Background">BG</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLOR & STROKE PALETTE SECTION -->
+            <div class="inspector-section">
+              <div class="section-title">COLORS & STYLE</div>
+              
+              <div class="form-field">
+                <label>Theme & Accent Color</label>
+                <div class="color-swatch-row">
+                  <button class="color-swatch" data-color="#3b82f6" style="background-color: #3b82f6;" title="Blue"></button>
+                  <button class="color-swatch" data-color="#ef4444" style="background-color: #ef4444;" title="Red"></button>
+                  <button class="color-swatch" data-color="#f59e0b" style="background-color: #f59e0b;" title="Amber / Orange"></button>
+                  <button class="color-swatch" data-color="#10b981" style="background-color: #10b981;" title="Green"></button>
+                  <button class="color-swatch" data-color="#8b5cf6" style="background-color: #8b5cf6;" title="Purple"></button>
+                  <button class="color-swatch" data-color="#ec4899" style="background-color: #ec4899;" title="Pink"></button>
+                  <button class="color-swatch" data-color="#64748b" style="background-color: #64748b;" title="Slate Gray"></button>
+                  <button class="color-swatch" data-color="#1e293b" style="background-color: #1e293b;" title="Dark Slate"></button>
+                  <button class="color-swatch" data-color="#ffffff" style="background-color: #ffffff; border: 1px solid #94a3b8;" title="White"></button>
+                  <button class="color-swatch" data-color="#000000" style="background-color: #000000;" title="Black"></button>
+                </div>
+              </div>
+
+              <div class="grid-2-col">
+                <div class="form-field">
+                  <label for="prop-color-picker">Primary Color</label>
+                  <div class="color-input-combo">
+                    <input type="color" id="prop-color-picker" class="input-color" value="#3b82f6" />
+                    <input type="text" id="prop-color-hex" class="input-text hex-input" value="#3b82f6" spellcheck="false" />
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="prop-stroke-picker">Stroke Color</label>
+                  <div class="color-input-combo">
+                    <input type="color" id="prop-stroke-picker" class="input-color" value="#1e293b" />
+                    <input type="text" id="prop-stroke-hex" class="input-text hex-input" value="#1e293b" spellcheck="false" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-2-col">
+                <div class="form-field">
+                  <label for="prop-stroke-width">Stroke Width</label>
+                  <select id="prop-stroke-width" class="input-select">
+                    <option value="1">1px (Thin)</option>
+                    <option value="2" selected>2px (Medium)</option>
+                    <option value="4">4px (Thick)</option>
+                    <option value="8">8px (Heavy Wall)</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="prop-stroke-style">Line Style</label>
+                  <select id="prop-stroke-style" class="input-select">
+                    <option value="solid" selected>Solid</option>
+                    <option value="dashed">Dashed</option>
+                    <option value="dotted">Dotted</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- LAYER ARRANGEMENT & GROUPING -->
+            <div class="inspector-section">
+              <div class="section-title">ARRANGEMENT & GROUPING</div>
+              <div class="grid-2-col">
+                <button id="btn-order-front" class="btn-secondary btn-sm" title="Bring to Front">
+                  Bring to Front
+                </button>
+                <button id="btn-order-back" class="btn-secondary btn-sm" title="Send to Back">
+                  Send to Back
+                </button>
+              </div>
+              <div class="grid-2-col mt-2">
+                <button id="btn-order-forward" class="btn-secondary btn-sm" title="Bring Forward">
+                  Bring Forward
+                </button>
+                <button id="btn-order-backward" class="btn-secondary btn-sm" title="Send Backward">
+                  Send Backward
+                </button>
+              </div>
+              <div class="grid-2-col mt-2">
+                <button id="btn-group-toggle" class="btn-secondary btn-sm" title="Group Multiple Selected Objects (Ctrl+G)">
+                  Group / Ungroup
+                </button>
+                <button id="btn-save-as-asset" class="btn-secondary btn-sm" title="Save object to My Assets library">
+                  Save to My Assets
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT 2: LAYERS PANEL -->
+        <div id="tab-layers" class="sidebar-pane">
+          <div class="layers-toolbar">
+            <span class="layers-count"><span id="layers-total-count">0</span> Objects</span>
+            <div class="layers-actions">
+              <button id="btn-layers-sort" class="btn-icon-micro" title="Reverse order">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 16 4 4 4-4M7 20V4M21 8l-4-4-4 4M17 4v16"/></svg>
+              </button>
+              <button id="btn-layers-select-all" class="btn-icon-micro" title="Select All (Ctrl+A)">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+              </button>
+            </div>
+          </div>
+          <!-- Drag-and-drop layer list container -->
+          <ul id="layers-list" class="layers-list">
+            <!-- Dynamically populated layers -->
+          </ul>
+        </div>
+
+        <!-- TAB CONTENT 3: SHOT LIST -->
+        <div id="tab-shots" class="sidebar-pane">
+          <div class="shotlist-header">
+            <span class="section-title">SHOT LIST</span>
+            <button id="btn-add-shot" class="btn btn-primary btn-sm">+ Add Shot</button>
+          </div>
+          <div id="shotlist-container" class="shotlist-container">
+            <!-- Dynamically populated shots -->
+          </div>
+        </div>
+
+        <!-- TAB CONTENT 4: SCENE NOTES & SUMMARY -->
+        <div id="tab-notes" class="sidebar-pane">
+          <div class="notes-section">
+            <div class="section-title">SCENE INFORMATION</div>
+            <div class="form-field">
+              <label for="scene-meta-number">Scene Number</label>
+              <input type="text" id="scene-meta-number" class="input-text" value="Scene 1" />
+            </div>
+            <div class="form-field">
+              <label for="scene-meta-name">Scene Title</label>
+              <input type="text" id="scene-meta-name" class="input-text" value="Terrace Scene" />
+            </div>
+            <div class="grid-2-col">
+              <div class="form-field">
+                <label for="scene-meta-env">Environment</label>
+                <select id="scene-meta-env" class="input-select">
+                  <option value="INT." selected>INT.</option>
+                  <option value="EXT.">EXT.</option>
+                  <option value="INT./EXT.">INT./EXT.</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="scene-meta-time">Time of Day</label>
+                <select id="scene-meta-time" class="input-select">
+                  <option value="DAY">DAY</option>
+                  <option value="NIGHT" selected>NIGHT</option>
+                  <option value="DUSK">DUSK</option>
+                  <option value="DAWN">DAWN</option>
+                  <option value="GOLDEN HOUR">GOLDEN HOUR</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="scene-meta-location">Location / Set</label>
+              <input type="text" id="scene-meta-location" class="input-text" value="Terrace Apartment" />
+            </div>
+            <div class="form-field">
+              <label for="scene-director-notes">Director & DP Blocking Notes</label>
+              <textarea id="scene-director-notes" class="input-textarea" rows="6" placeholder="Describe actor cues, camera movements, dramatic intentions, and lighting cues..."></textarea>
+            </div>
+          </div>
+
+          <div class="notes-section">
+            <div class="section-title">AUTOMATIC SCENE SUMMARY</div>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span class="stat-number" id="stat-actors">0</span>
+                <span class="stat-label">Actors</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-number" id="stat-cameras">0</span>
+                <span class="stat-label">Cameras</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-number" id="stat-lights">0</span>
+                <span class="stat-label">Lights</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-number" id="stat-props">0</span>
+                <span class="stat-label">Props</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-number" id="stat-vehicles">0</span>
+                <span class="stat-label">Vehicles</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-number" id="stat-drawings">0</span>
+                <span class="stat-label">Drawings</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ASSET LIBRARY MODAL (Common container for Actors, Cameras, Lighting, Props, Vehicles, My Assets) -->
+    <div id="asset-modal" class="modal-overlay hidden">
+      <div class="asset-modal-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span id="asset-modal-title" class="modal-title">Props Library</span>
+            <span id="asset-modal-subtitle" class="modal-subtitle">Click any asset to add it to your scene</span>
+          </div>
+          <!-- Search box -->
+          <div class="modal-search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="asset-search-input" class="search-input" placeholder="Search assets (e.g. Chair, Softbox, Van)..." />
+            <button id="btn-clear-search" class="btn-icon-micro hidden">✕</button>
+          </div>
+          <button id="btn-close-asset-modal" class="btn-icon" title="Close (Esc)">✕</button>
+        </div>
+
+        <!-- Subcategories tab bar (e.g. for Props: Furniture, Outside, Office, Restaurant, Home) -->
+        <div id="asset-category-tabs" class="asset-tabs-bar">
+          <!-- Dynamically filled -->
+        </div>
+
+        <!-- Grid of item cards -->
+        <div id="asset-items-grid" class="asset-grid">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div class="modal-footer">
+          <span class="modal-tip">💡 Tip: Drag-and-drop or click to place directly at canvas center.</span>
+          <button id="btn-modal-done" class="btn btn-secondary btn-sm">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HELP & KEYBOARD SHORTCUTS MODAL -->
+    <div id="help-modal" class="modal-overlay hidden">
+      <div class="help-modal-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="modal-title">FramePlan Studio Guide & Shortcuts</span>
+            <span class="modal-subtitle">Professional shortcuts for fast scene planning</span>
+          </div>
+          <button id="btn-close-help" class="btn-icon">✕</button>
+        </div>
+        <div class="help-modal-body">
+          <div class="shortcuts-grid">
+            <div class="shortcut-group">
+              <h4 class="shortcut-group-title">TOOLS & MODES</h4>
+              <div class="shortcut-row"><span class="key-badge">V</span><span>Select & Move tool</span></div>
+              <div class="shortcut-row"><span class="key-badge">H</span><span>Hand / Pan Canvas</span></div>
+              <div class="shortcut-row"><span class="key-badge">A</span><span>Actor Library</span></div>
+              <div class="shortcut-row"><span class="key-badge">C</span><span>Camera Library</span></div>
+              <div class="shortcut-row"><span class="key-badge">L</span><span>Lighting Library</span></div>
+              <div class="shortcut-row"><span class="key-badge">P</span><span>Props Library</span></div>
+              <div class="shortcut-row"><span class="key-badge">B</span><span>Blocking Path Arrow</span></div>
+              <div class="shortcut-row"><span class="key-badge">D</span><span>Freehand Draw</span></div>
+              <div class="shortcut-row"><span class="key-badge">S</span><span>Shapes & Walls</span></div>
+              <div class="shortcut-row"><span class="key-badge">T</span><span>Text Label</span></div>
+              <div class="shortcut-row"><span class="key-badge">E</span><span>Eraser Tool</span></div>
+              <div class="shortcut-row"><span class="key-badge">M</span><span>Measurement Ruler</span></div>
+            </div>
+
+            <div class="shortcut-group">
+              <h4 class="shortcut-group-title">CANVAS & EDITING</h4>
+              <div class="shortcut-row"><span class="key-badge">Ctrl + Z</span><span>Undo action</span></div>
+              <div class="shortcut-row"><span class="key-badge">Ctrl + Y</span><span>Redo action</span></div>
+              <div class="shortcut-row"><span class="key-badge">Ctrl + D</span><span>Duplicate selection</span></div>
+              <div class="shortcut-row"><span class="key-badge">Ctrl + C / V</span><span>Copy / Paste</span></div>
+              <div class="shortcut-row"><span class="key-badge">Ctrl + A</span><span>Select All objects</span></div>
+              <div class="shortcut-row"><span class="key-badge">Del / Backspace</span><span>Delete selected</span></div>
+              <div class="shortcut-row"><span class="key-badge">Ctrl + G</span><span>Group / Ungroup</span></div>
+              <div class="shortcut-row"><span class="key-badge">Space + Drag</span><span>Pan canvas smoothly</span></div>
+              <div class="shortcut-row"><span class="key-badge">Wheel</span><span>Zoom in/out at cursor</span></div>
+              <div class="shortcut-row"><span class="key-badge">Shift + Click</span><span>Multi-select objects</span></div>
+              <div class="shortcut-row"><span class="key-badge">Ctrl + S</span><span>Save Project</span></div>
+            </div>
+          </div>
+
+          <div class="help-section mt-4">
+            <h4 class="shortcut-group-title">FILMMAKER TIPS</h4>
+            <ul class="help-tips-list">
+              <li><strong>Camera FOV:</strong> Select any camera to adjust its focal length (18mm, 24mm, 35mm, 50mm, 85mm, 135mm) and observe the real optical field-of-view cone interactively.</li>
+              <li><strong>Lighting Spread:</strong> Adjust beam spread angle, distance, and gel temperature (3200K, 5600K, etc.) to communicate your lighting setups to gaffers and DPs.</li>
+              <li><strong>Actor & Camera Blocking:</strong> Use the Blocking tool to draw trajectory paths indicating movement from start to finish with arrows and directional cues.</li>
+              <li><strong>Measurements:</strong> Use the Measure tool (M) to check physical distances between actors, cameras, and lights in meters or feet.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-help-ok" class="btn btn-primary btn-sm">Got It</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTEXT MENU (Right-Click) -->
+    <div id="context-menu" class="context-menu hidden">
+      <div class="context-menu-header" id="ctx-obj-name">Selected Object</div>
+      <button class="ctx-item" id="ctx-duplicate"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Duplicate</span><span class="ctx-shortcut">Ctrl+D</span></button>
+      <button class="ctx-item" id="ctx-rename"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg><span>Rename</span></button>
+      <button class="ctx-item" id="ctx-save-asset"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg><span>Save to My Assets</span></button>
+      <button class="ctx-item" id="ctx-add-timeline"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Add to Timeline Track</span><span class="ctx-shortcut">T</span></button>
+      <div class="ctx-divider"></div>
+      <button class="ctx-item" id="ctx-front"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/></svg><span>Bring to Front</span></button>
+      <button class="ctx-item" id="ctx-forward"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg><span>Bring Forward</span></button>
+      <button class="ctx-item" id="ctx-backward"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg><span>Send Backward</span></button>
+      <button class="ctx-item" id="ctx-back"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 17 12 22 22 17"/></svg><span>Send to Back</span></button>
+      <div class="ctx-divider"></div>
+      <button class="ctx-item" id="ctx-group"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg><span>Group / Ungroup</span><span class="ctx-shortcut">Ctrl+G</span></button>
+      <button class="ctx-item" id="ctx-lock"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span id="ctx-lock-label">Lock</span></button>
+      <button class="ctx-item" id="ctx-hide"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/></svg><span id="ctx-hide-label">Hide</span></button>
+      <div class="ctx-divider"></div>
+      <button class="ctx-item ctx-danger" id="ctx-delete"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg><span>Delete</span><span class="ctx-shortcut">Del</span></button>
+    </div>
+
+    <!-- DEDICATED PRINT CONTAINER (Active during window.print()) -->
+    <div id="print-sheet-wrapper" class="print-sheet-wrapper print-only">
+      <div class="print-header">
+        <div class="print-brand">
+          <h1>FRAMEPLAN STUDIO</h1>
+          <p class="print-sub">DIRECTOR & DP PRE-PRODUCTION BLOCKING PLAN</p>
+        </div>
+        <div class="print-meta-box">
+          <div class="print-meta-row"><strong>PROJECT:</strong> <span id="print-project-name">Untitled Film Project</span></div>
+          <div class="print-meta-row"><strong>DATE:</strong> <span id="print-date"></span></div>
+        </div>
+      </div>
+
+      <div class="print-slugline-banner">
+        <h2 id="print-scene-heading">SCENE 1 — INT. TERRACE APARTMENT - NIGHT</h2>
+      </div>
+
+      <!-- High-resolution scene diagram container for print -->
+      <div class="print-diagram-box">
+        <svg id="print-diagram-svg" class="print-svg" viewBox="0 0 1200 800">
+          <!-- Cloned diagram content injected by script -->
+        </svg>
+      </div>
+
+      <!-- Notes and Legend section -->
+      <div class="print-footer-grid">
+        <div class="print-notes-column">
+          <h3>DIRECTOR / CINEMATOGRAPHY NOTES</h3>
+          <div id="print-notes-text" class="print-notes-body">
+            No director notes recorded.
+          </div>
+        </div>
+        <div class="print-legend-column">
+          <h3>SCENE LEGEND & KEY</h3>
+          <div id="print-legend-body" class="print-legend-body">
+            <!-- Injected by script -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Shot List for print -->
+      <div class="print-shotlist-section">
+        <h3>PLANNED SHOT LIST</h3>
+        <table id="print-shotlist-table" class="print-table">
+          <thead>
+            <tr>
+              <th>Shot #</th>
+              <th>Camera</th>
+              <th>Shot Type</th>
+              <th>Lens</th>
+              <th>Movement</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody id="print-shotlist-tbody">
+            <!-- Injected by script -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="./js/data.js"></script>
+  <script src="./js/state.js"></script>
+  <script src="./js/canvas.js"></script>
+  <script src="./js/timeline.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "FramePlan Studio",
+  "description": "Professional browser-based film scene planning, shot blocking, and lighting diagram studio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
